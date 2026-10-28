@@ -143,7 +143,7 @@ const packCards = () => `<div class="packs">${PACKS.map((p, i) => `<button class
     <b>${p.name}</b><small>${p.items.length}개</small></button>`).join("")}</div>`;
 const stickerButtons = i => `<div class="pack-head"><button class="back" id="packBack">‹ 스티커 팩</button><b>${PACKS[i].name}</b></div>
   <div class="stickers${PACKS[i].glitter ? " glit" : " drawn"}">${PACKS[i].items.map(s => `<button data-s="${s}" aria-label="${stickerLabel(s) || "그림"} 스티커">${stickerHTML(s)}</button>`).join("")}</div>`;
-const grid = () => `<div id="stkArea">${lastPack === null ? packCards() : stickerButtons(lastPack)}</div>`;
+const grid = () => (lastPack = null, `<div id="stkArea">${packCards()}</div>`);
 function wireTabs(h, onPick) {
   const area = $("stkArea");
   const show = () => {
