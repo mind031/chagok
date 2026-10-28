@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>차곡차곡</title>
+<meta name="theme-color" content="#ffffff">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="차곡차곡">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&display=swap">
+<style>
+/* 종이 스티커판 그림을 그대로 깔고, 같은 자리에 스티커·날짜·개수·누적 용돈을 얹는다 */
+:root{
+  --bg:#ffffff; --ink:#4a3a33; --soft:#8a7b72; --line:#eee5dc;
+  --orange:#ff8a3d; --pink:#ff5a86; --green:#3fa34d; --purple:#8f6fd8; --blue:#1f6fd6; --gold:#f2a900;
+  --f:"Jua","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg);margin:0}
+body{color:var(--ink);font-family:var(--f);word-break:keep-all;
+  padding-top:max(10px,env(safe-area-inset-top,0px));padding-bottom:max(16px,env(safe-area-inset-bottom,0px));
+  padding-left:max(10px,env(safe-area-inset-left,0px));padding-right:max(10px,env(safe-area-inset-right,0px))}
+[hidden]{display:none!important}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible,label:focus-within{outline:3px solid var(--blue);outline-offset:2px}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.board{position:relative;width:100%;min-width:880px;max-width:1448px;margin:0 auto;container-type:inline-size;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.board>img{display:block;width:100%;height:auto;pointer-events:none}
+.o{position:absolute}
+.patch{background:#fff}
+
+.pbtn{border:none;background:#fff;border-radius:1.2cqw;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.3cqw;font-size:1.5cqw;color:var(--orange)}
+.pbtn .k{font-size:2.6cqw;line-height:1}
+.pbtn small{font-size:.95cqw;color:var(--soft)}
+.parent-on .pbtn{background:#f3eefe;color:var(--purple)}
+
+.wk{display:flex;align-items:center;justify-content:space-between;gap:.4cqw}
+.wk .nav{border:none;background:#fff3e8;color:var(--orange);width:2.4cqw;height:2.4cqw;border-radius:50%;font-size:1.6cqw;line-height:1;display:grid;place-items:center;flex:none;padding:0}
+.wk label{position:relative;flex:1;text-align:center;font-size:1.75cqw;white-space:nowrap;cursor:pointer;border-radius:1cqw;padding:.3cqw 0}
+.wk label .c{font-size:1.1cqw;margin-left:.4cqw}
+.wk input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+
+.say{display:flex;align-items:center;justify-content:center;text-align:center;font-size:.98cqw;line-height:1.35;border-radius:50%;transition:transform .25s}
+.say.pop{transform:scale(1.12)}
+.today{border:.25cqw solid #ffd23f;border-radius:.8cqw;pointer-events:none;box-shadow:0 0 0 .2cqw rgba(255,210,63,.25)}
+
+.cell{border:none;background:transparent;display:flex;align-items:center;justify-content:center;padding:0;border-radius:.6cqw}
+.cell:active{background:rgba(255,200,120,.18)}
+.cell .stk{font-size:3.5cqw;line-height:1;filter:drop-shadow(0 .15cqw 0 rgba(0,0,0,.15));animation:stick .35s ease;background:#fff;border-radius:50%;width:5cqw;height:5cqw;display:grid;place-items:center}
+@keyframes stick{0%{transform:scale(.3) rotate(-20deg)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
+.cell.wait .stk{opacity:.5;animation:none}
+.cell.wait::after{content:"확인 중";position:absolute;bottom:.2cqw;font-size:.8cqw;color:#fff;background:var(--purple);border-radius:999px;padding:.05cqw .5cqw}
+
+.got{border:.25cqw solid var(--gold);border-radius:1cqw;pointer-events:none;background:rgba(255,226,122,.18)}
+.got::after{content:"✓";position:absolute;top:-.8cqw;right:-.6cqw;width:1.8cqw;height:1.8cqw;border-radius:50%;background:var(--gold);color:#fff;font-size:1.1cqw;display:grid;place-items:center}
+
+.cnt{display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.cnt b{font-weight:400;font-size:4.6cqw;line-height:1;color:var(--pink);font-variant-numeric:tabular-nums}
+.cnt span{font-size:.95cqw;color:var(--soft);white-space:nowrap}
+
+.pill{background:#5cb84a;color:#fff;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:1.35cqw}
+.saved{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.3cqw;border-radius:1cqw}
+.saved .t{font-size:1.25cqw;color:var(--green)}
+.saved b{font-weight:400;font-size:3.6cqw;line-height:1;color:var(--green);font-variant-numeric:tabular-nums}
+.saved b small{font-size:1.6cqw;margin-left:.3cqw;color:var(--ink)}
+.saved .sub{font-size:.95cqw;color:var(--soft)}
+
+.modebar{display:none;max-width:1448px;margin:0 auto 10px;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:#f3eefe;border:2px dashed var(--purple);border-radius:14px;padding:8px 14px;font-size:16px;color:var(--purple)}
+.parent-on .modebar{display:flex}
+.modebar .acts{display:flex;gap:8px;flex-wrap:wrap}
+.modebar button{border:none;background:var(--purple);color:#fff;border-radius:999px;padding:7px 16px}
+.modebar .ghost{background:#fff;color:var(--purple);border:2px solid var(--purple)}
+
+.sheet-bg{position:fixed;inset:0;background:rgba(40,25,15,.45);display:flex;align-items:flex-end;justify-content:center;z-index:50;padding:16px;padding-bottom:max(16px,env(safe-area-inset-bottom,0px))}
+@media (min-width:640px){.sheet-bg{align-items:center}}
+.sheet{background:#fff;border-radius:24px;padding:20px;width:min(460px,100%);display:flex;flex-direction:column;gap:12px;max-height:90vh;overflow:auto}
+.sheet h3{margin:0;font-weight:400;font-size:22px;text-wrap:balance}
+.sheet p{margin:0;color:var(--soft);font-size:16px}
+.stickers{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.stickers button{border:2px solid var(--line);background:#fffaf4;border-radius:14px;aspect-ratio:1;font-size:30px;max-width:100%;padding:0}
+.acts2{display:flex;gap:8px}
+.acts2 button{flex:1;border:none;border-radius:999px;padding:12px;font-size:17px;background:var(--line)}
+.acts2 .ok{background:#5cb84a;color:#fff} .acts2 .no{background:var(--pink);color:#fff}
+.big1{font-size:64px;text-align:center}
+.pin-dots{display:flex;gap:12px;justify-content:center;padding:6px}
+.pin-dots span{width:16px;height:16px;border-radius:50%;border:2px solid var(--purple)}
+.pin-dots span.on{background:var(--purple)}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pad button{border:none;background:#f3eefe;border-radius:16px;padding:14px 0;font-size:24px}
+.err{color:var(--pink);text-align:center;min-height:1.2em}
+.field{display:flex;flex-direction:column;gap:4px;font-size:15px;color:var(--soft)}
+.field input{border:2px solid var(--line);border-radius:12px;padding:10px 12px;font-size:17px;font-family:system-ui,sans-serif;color:var(--ink)}
+.note{text-align:center;font-size:13px;color:var(--soft);margin:10px 0 0}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="modebar" role="status">
+  <span>엄마·아빠 모드예요. 칸을 누르면 바로 붙이거나 뗄 수 있어요.</span>
+  <span class="acts"><button id="approveAll">확인 중인 스티커 모두 승인</button><button class="ghost" id="exitParent">나가기</button><button class="ghost" id="logout" hidden>로그아웃</button></span>
+</div>
+<div class="scroll">
+  <div class="board" id="board">
+    <img src="board.webp" alt="내가 스스로 하는 하루 미션 스티커판" width="1448" height="1086">
+    <div id="ov"></div>
+  </div>
+</div>
+<p class="note" id="syncNote"></p>
+<div id="sheetHost"></div>
+
+<script src="firebase-config.js"></script>
+<script type="module" src="app.js"></script>
+</body>
+</html>
