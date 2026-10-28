@@ -1,4 +1,5 @@
 // 차곡차곡 — 아이 주간 미션 스티커판
+import { DRAWN_PACKS, NAMES, stickerSVG, isDrawn } from "./stickers.js";
 const FB_VER = "10.12.2";
 
 const IW = 1448, IH = 1086;
@@ -8,7 +9,15 @@ const MISSIONS = ["아침에 씻고 양치하기","옷 입고 정리하기","샤
 const DAYS = ["월","화","수","목","금","토","일"];
 const TIERS = [[30,1000],[40,1500],[50,2000],[60,2500],[65,3000]];
 const TIER_BOX = [[38,958,134,1062],[140,958,238,1062],[242,958,340,1062],[344,958,442,1062],[446,958,544,1062]];
-const STICKERS = "🐶 🐱 🐰 🐻 🐼 🐨 🐯 🦁 🐸 🐷 🐥 🐧 🐳 🦄 🐹 🦊 🍓 🍎 🍌 🍇 🍑 🍉 🍒 🍊".split(" ");
+// 스티커 팩: 손그림 팩 3개 + 반짝이 팩
+const PACKS = [
+  ...DRAWN_PACKS.map(p => ({ ...p, items: p.items.map(id => "d:" + id) })),
+  { id: "glitter", name: "반짝이", color: "#f3e8ff", glitter: true,
+    items: "🐶 🐱 🐰 🐼 🦄 🐳 🍓 🍉 🍩 🧁 🍭 🍦 ⭐ 🌈 💖 🌸 🎀 💎 🚀 🚒 🚂 🛸 🦖 🐲".split(" ") }
+];
+const STICKERS = PACKS.flatMap(p => p.items);
+const stickerLabel = s => isDrawn(s) ? NAMES[s.slice(2)] : s;
+const stickerHTML = s => isDrawn(s) ? stickerSVG(s.slice(2)) : `<i>${esc(s)}</i>`;
 const HELLO = "매일 매일<br>스티커를 모아보자!";
 
 const $ = id => document.getElementById(id);
@@ -76,7 +85,7 @@ function buildOverlay() {
 }
 
 /* ---------- 그리기 ---------- */
-const STICKER_SET = new Set(STICKERS);
+const STICKER_SET = new Set([...STICKERS, ..."🐶 🐱 🐰 🐻 🐼 🐨 🐯 🦁 🐸 🐷 🐥 🐧 🐳 🦄 🐹 🦊 🍓 🍎 🍌 🍇 🍑 🍉 🍒 🍊".split(" ")]);
 function render() {
   const s = parse(cur), e = addDays(s, 6);
   $("range").textContent = `${s.getMonth()+1}월 ${s.getDate()}일 ~ ${e.getMonth()+1}월 ${e.getDate()}일`;
@@ -92,7 +101,10 @@ function render() {
     if (c.dataset.v === want) return;
     c.dataset.v = want;
     c.classList.toggle("wait", !!ok && !v.ok);
-    c.innerHTML = ok ? `<span class="stk">${esc(v.s)}</span>` : "";
+    if (ok) {
+      const h = [...c.dataset.c].reduce((n, ch) => n * 31 + ch.charCodeAt(0), 7);
+      c.innerHTML = `<span class="stk${isDrawn(v.s) ? " drawn" : ""}" style="--tilt:${(h % 15) - 7}deg;--d:${(h % 9) * 0.5}s">${stickerHTML(v.s)}</span>`;
+    } else c.innerHTML = "";
   });
   const n = count(cur), r = rewardFor(n);
   $("cnt").textContent = n;
@@ -125,7 +137,35 @@ function openSheet(html, bind, closable = true) {
   const f = host.querySelector("input,button"); f && f.focus();
 }
 function closeSheet() { $("sheetHost").innerHTML = ""; }
-const grid = () => `<div class="stickers">${STICKERS.map(s => `<button data-s="${s}" aria-label="스티커 ${s}">${s}</button>`).join("")}</div>`;
+let lastPack = null;
+const packCards = () => `<div class="packs">${PACKS.map((p, i) => `<button class="pack" data-pack="${i}" style="--pc:${p.color}">
+    <span class="pv">${p.items.slice(0, 4).map(s => `<span class="mini${isDrawn(s) ? "" : " glit"}">${stickerHTML(s)}</span>`).join("")}</span>
+    <b>${p.name}</b><small>${p.items.length}개</small></button>`).join("")}</div>`;
+const stickerButtons = i => `<div class="pack-head"><button class="back" id="packBack">‹ 스티커 팩</button><b>${PACKS[i].name}</b></div>
+  <div class="stickers${PACKS[i].glitter ? " glit" : " drawn"}">${PACKS[i].items.map(s => `<button data-s="${s}" aria-label="${stickerLabel(s)} 스티커">${stickerHTML(s)}</button>`).join("")}</div>`;
+const grid = () => `<div id="stkArea">${lastPack === null ? packCards() : stickerButtons(lastPack)}</div>`;
+function wireTabs(h, onPick) {
+  const area = $("stkArea");
+  const show = () => {
+    area.innerHTML = lastPack === null ? packCards() : stickerButtons(lastPack);
+    area.querySelectorAll("[data-pack]").forEach(b => b.onclick = () => { lastPack = +b.dataset.pack; show(); });
+    area.querySelectorAll("[data-s]").forEach(b => b.onclick = () => onPick(b));
+    const bk = $("packBack"); if (bk) bk.onclick = () => { lastPack = null; show(); };
+  };
+  show();
+}
+function sparkle(ck) {
+  const c = document.querySelector(`.cell[data-c="${ck}"]`); if (!c) return;
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  for (let i = 0; i < 7; i++) {
+    const s = document.createElement("span"); s.className = "spark"; s.textContent = i % 2 ? "✦" : "✧";
+    const a = i / 7 * Math.PI * 2;
+    s.style.left = c.style.left; s.style.top = c.style.top;
+    s.style.marginLeft = `calc(${c.style.width} / 2)`; s.style.marginTop = `calc(${c.style.height} / 2 - 1.5%)`;
+    s.style.setProperty("--x", `${Math.cos(a) * 3.2}cqw`); s.style.setProperty("--y", `${Math.sin(a) * 3.2}cqw`);
+    $("ov").appendChild(s); setTimeout(() => s.remove(), 900);
+  }
+}
 
 function onCell(ck) {
   const v = ((weeks[cur] || {}).cells || {})[ck];
@@ -133,7 +173,9 @@ function onCell(ck) {
   const head = `<h3>${DAYS[d]}요일 · ${MISSIONS[r]}</h3>`;
   const tail = `<div class="acts2">${v ? '<button class="no" id="rm">떼기</button>' : ""}<button id="cl">닫기</button></div>`;
   const wire = (ok, after) => h => {
-    h.querySelectorAll("[data-s]").forEach(b => b.onclick = () => { const before = count(cur); writeCell(cur, ck, { s: b.dataset.s, ok }); closeSheet(); after(before); });
+    const pick = b => { const before = count(cur); writeCell(cur, ck, { s: b.dataset.s, ok }); closeSheet(); sparkle(ck); after(before); };
+    h.querySelectorAll("[data-s]").forEach(b => b.onclick = () => pick(b));
+    wireTabs(h, pick);
     $("cl").onclick = closeSheet;
     if (v) $("rm").onclick = () => { writeCell(cur, ck, null); closeSheet(); };
   };
@@ -144,7 +186,7 @@ function onCell(ck) {
     return;
   }
   if (v && !v.ok) {
-    openSheet(head + `<p>아이가 붙인 스티커예요.</p><div class="big1">${esc(v.s)}</div><div class="acts2"><button class="ok" id="ap">승인하기</button><button class="no" id="rm">떼기</button></div>`, () => {
+    openSheet(head + `<p>아이가 붙인 스티커예요.</p><div class="big1${isDrawn(v.s) ? " drawn" : ""}">${stickerHTML(v.s)}</div><div class="acts2"><button class="ok" id="ap">승인하기</button><button class="no" id="rm">떼기</button></div>`, () => {
       $("ap").onclick = () => { approve([ck]); closeSheet(); };
       $("rm").onclick = () => { writeCell(cur, ck, null); closeSheet(); };
     });
@@ -158,7 +200,7 @@ function cheer(before) {
 }
 function approve(keys) {
   const before = count(cur), cells = (weeks[cur] || {}).cells || {};
-  keys.forEach(k => { const v = cells[k]; if (v && !v.ok) writeCell(cur, k, { s: v.s, ok: true }); });
+  keys.forEach(k => { const v = cells[k]; if (v && !v.ok) { writeCell(cur, k, { s: v.s, ok: true }); sparkle(k); } });
   cheer(before);
 }
 

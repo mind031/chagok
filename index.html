@@ -55,10 +55,22 @@ button:focus-visible,label:focus-within{outline:3px solid var(--blue);outline-of
 
 .cell{border:none;background:transparent;display:flex;align-items:center;justify-content:center;padding:0;border-radius:.6cqw}
 .cell:active{background:rgba(255,200,120,.18)}
-.cell .stk{font-size:3.5cqw;line-height:1;filter:drop-shadow(0 .15cqw 0 rgba(0,0,0,.15));animation:stick .35s ease;background:#fff;border-radius:50%;width:5cqw;height:5cqw;display:grid;place-items:center}
-@keyframes stick{0%{transform:scale(.3) rotate(-20deg)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
-.cell.wait .stk{opacity:.5;animation:none}
-.cell.wait::after{content:"확인 중";position:absolute;bottom:.2cqw;font-size:.8cqw;color:#fff;background:var(--purple);border-radius:999px;padding:.05cqw .5cqw}
+.cell .stk{position:relative;font-size:3.2cqw;line-height:1;width:5.1cqw;height:5.1cqw;border-radius:50%;display:grid;place-items:center;overflow:hidden;
+  background:conic-gradient(from 210deg,#ffd6e8,#ffe9b8,#d9ffd1,#c9f1ff,#e2d6ff,#ffd6f5,#ffd6e8);
+  border:.32cqw solid #fff;box-shadow:0 .25cqw .5cqw rgba(90,60,40,.28),inset 0 0 0 .12cqw rgba(255,255,255,.7);
+  transform:rotate(var(--tilt,0deg));animation:stick .45s cubic-bezier(.3,1.6,.5,1)}
+.cell .stk i{font-style:normal;position:relative;z-index:1;filter:drop-shadow(0 .1cqw 0 rgba(255,255,255,.9)) drop-shadow(0 .15cqw .1cqw rgba(0,0,0,.18))}
+.cell .stk::before{content:"";position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.95) 0 6%,transparent 7%),radial-gradient(circle at 72% 70%,rgba(255,255,255,.8) 0 3%,transparent 4%),radial-gradient(circle at 78% 28%,rgba(255,255,255,.7) 0 2.5%,transparent 3.5%),radial-gradient(circle at 22% 74%,rgba(255,255,255,.7) 0 2%,transparent 3%);z-index:2;pointer-events:none}
+.cell .stk::after{content:"";position:absolute;top:-20%;bottom:-20%;width:45%;left:-60%;z-index:2;pointer-events:none;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.85),transparent);transform:skewX(-18deg);animation:shine 4.5s ease-in-out infinite;animation-delay:var(--d,0s)}
+@keyframes shine{0%,72%{left:-60%}100%{left:130%}}
+@keyframes stick{0%{transform:scale(.2) rotate(-30deg)}70%{transform:scale(1.18) rotate(var(--tilt,0deg))}100%{transform:scale(1) rotate(var(--tilt,0deg))}}
+.cell.wait .stk{filter:grayscale(.55) opacity(.55);animation:none;border-style:dashed;border-color:#c9b8f0}
+.cell.wait .stk::after{display:none}
+.cell.wait::after{content:"확인 중";position:absolute;bottom:.2cqw;z-index:3;font-size:.8cqw;color:#fff;background:var(--purple);border-radius:999px;padding:.05cqw .5cqw}
+.spark{position:absolute;z-index:4;pointer-events:none;font-size:1.4cqw;color:#ffcf33;text-shadow:0 0 .4cqw #fff;animation:spark .8s ease-out forwards}
+@keyframes spark{0%{transform:translate(0,0) scale(.4);opacity:1}100%{transform:translate(var(--x),var(--y)) scale(1.1);opacity:0}}
 
 .got{border:.25cqw solid var(--gold);border-radius:1cqw;pointer-events:none;background:rgba(255,226,122,.18)}
 .got::after{content:"✓";position:absolute;top:-.8cqw;right:-.6cqw;width:1.8cqw;height:1.8cqw;border-radius:50%;background:var(--gold);color:#fff;font-size:1.1cqw;display:grid;place-items:center}
@@ -85,8 +97,30 @@ button:focus-visible,label:focus-within{outline:3px solid var(--blue);outline-of
 .sheet{background:#fff;border-radius:24px;padding:20px;width:min(460px,100%);display:flex;flex-direction:column;gap:12px;max-height:90vh;overflow:auto}
 .sheet h3{margin:0;font-weight:400;font-size:22px;text-wrap:balance}
 .sheet p{margin:0;color:var(--soft);font-size:16px}
-.stickers{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
-.stickers button{border:2px solid var(--line);background:#fffaf4;border-radius:14px;aspect-ratio:1;font-size:30px;max-width:100%;padding:0}
+.packs{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.pack{border:none;border-radius:20px;background:var(--pc);padding:12px 10px 10px;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 2px 0 rgba(74,58,51,.12)}
+.pack .pv{display:grid;grid-template-columns:repeat(2,1fr);gap:2px;width:92px}
+.pack .mini{width:44px;height:44px;display:grid;place-items:center}
+.pack .mini svg{width:44px;height:44px}
+.pack .mini.glit i{font-style:normal;font-size:26px}
+.pack b{font-weight:400;font-size:18px}
+.pack small{font-size:13px;color:var(--soft)}
+.pack-head{display:flex;align-items:center;gap:10px}
+.pack-head b{font-weight:400;font-size:18px}
+.back{border:none;background:#f6f1ea;border-radius:999px;padding:7px 12px;font-size:15px}
+.stickers{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px}
+.stickers button{position:relative;border:none;background:#fbf7f1;border-radius:18px;aspect-ratio:1;max-width:100%;padding:4px;display:grid;place-items:center}
+.stickers button svg{width:100%;height:100%;filter:drop-shadow(0 2px 2px rgba(74,58,51,.25))}
+.stickers.glit button{border:3px solid #fff;border-radius:50%;font-size:28px;overflow:hidden;padding:0;
+  background:conic-gradient(from 210deg,#ffd6e8,#ffe9b8,#d9ffd1,#c9f1ff,#e2d6ff,#ffd6f5,#ffd6e8);box-shadow:0 2px 5px rgba(90,60,40,.25)}
+.stickers.glit button i{font-style:normal}
+.stickers button:active{transform:scale(.92)}
+.big1.drawn svg{width:120px;height:120px}
+.big1 i{font-style:normal}
+.cell .stk.drawn{background:none;border:none;box-shadow:none;overflow:visible;width:5.6cqw;height:5.6cqw}
+.cell .stk.drawn::before,.cell .stk.drawn::after{display:none}
+.cell .stk.drawn svg{width:100%;height:100%;filter:drop-shadow(0 .2cqw .25cqw rgba(74,58,51,.3))}
+.cell.wait .stk.drawn{border:none;filter:grayscale(.5) opacity(.5)}
 .acts2{display:flex;gap:8px}
 .acts2 button{flex:1;border:none;border-radius:999px;padding:12px;font-size:17px;background:var(--line)}
 .acts2 .ok{background:#5cb84a;color:#fff} .acts2 .no{background:var(--pink);color:#fff}
@@ -118,6 +152,6 @@ button:focus-visible,label:focus-within{outline:3px solid var(--blue);outline-of
 <div id="sheetHost"></div>
 
 <script src="firebase-config.js"></script>
-<script type="module" src="app.js"></script>
+<script type="module" src="app.js?v=4"></script>
 </body>
 </html>
