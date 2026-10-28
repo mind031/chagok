@@ -1,5 +1,5 @@
 // 차곡차곡 — 아이 주간 미션 스티커판
-import { DRAWN_PACKS, NAMES, stickerSVG, isDrawn } from "./stickers.js";
+import { DRAWN_PACKS, NAMES, stickerSVG, isDrawn, SHEET_PACKS, isSheet, sheetImg } from "./stickers.js";
 const FB_VER = "10.12.2";
 
 const IW = 1448, IH = 1086;
@@ -9,15 +9,15 @@ const MISSIONS = ["아침에 씻고 양치하기","옷 입고 정리하기","샤
 const DAYS = ["월","화","수","목","금","토","일"];
 const TIERS = [[30,1000],[40,1500],[50,2000],[60,2500],[65,3000]];
 const TIER_BOX = [[38,958,134,1062],[140,958,238,1062],[242,958,340,1062],[344,958,442,1062],[446,958,544,1062]];
-// 스티커 팩: 손그림 팩 3개 + 반짝이 팩
-const PACKS = [
-  ...DRAWN_PACKS.map(p => ({ ...p, items: p.items.map(id => "d:" + id) })),
-  { id: "glitter", name: "반짝이", color: "#f3e8ff", glitter: true,
-    items: "🐶 🐱 🐰 🐼 🦄 🐳 🍓 🍉 🍩 🧁 🍭 🍦 ⭐ 🌈 💖 🌸 🎀 💎 🚀 🚒 🚂 🛸 🦖 🐲".split(" ") }
-];
+// 스티커 팩: 엄마·아빠가 준 스티커 판 8개
+const PACKS = SHEET_PACKS;
+// 예전에 붙인 스티커도 그대로 보이게
+const OLD_STICKERS = [...DRAWN_PACKS.flatMap(p => p.items.map(id => "d:" + id)),
+  ..."🐶 🐱 🐰 🐻 🐼 🐨 🐯 🦁 🐸 🐷 🐥 🐧 🐳 🦄 🐹 🦊 🍓 🍎 🍌 🍇 🍑 🍉 🍒 🍊 🍩 🧁 🍭 🍦 ⭐ 🌈 💖 🌸 🎀 💎 🚀 🚒 🚂 🛸 🦖 🐲".split(" ")];
 const STICKERS = PACKS.flatMap(p => p.items);
-const stickerLabel = s => isDrawn(s) ? NAMES[s.slice(2)] : s;
-const stickerHTML = s => isDrawn(s) ? stickerSVG(s.slice(2)) : `<i>${esc(s)}</i>`;
+const stickerLabel = s => isSheet(s) ? "" : isDrawn(s) ? NAMES[s.slice(2)] : s;
+const stickerHTML = s => isSheet(s) ? sheetImg(s) : isDrawn(s) ? stickerSVG(s.slice(2)) : `<i>${esc(s)}</i>`;
+const isPic = s => isSheet(s) || isDrawn(s);
 const HELLO = "매일 매일<br>스티커를 모아보자!";
 
 const $ = id => document.getElementById(id);
@@ -85,7 +85,7 @@ function buildOverlay() {
 }
 
 /* ---------- 그리기 ---------- */
-const STICKER_SET = new Set([...STICKERS, ..."🐶 🐱 🐰 🐻 🐼 🐨 🐯 🦁 🐸 🐷 🐥 🐧 🐳 🦄 🐹 🦊 🍓 🍎 🍌 🍇 🍑 🍉 🍒 🍊".split(" ")]);
+const STICKER_SET = new Set([...STICKERS, ...OLD_STICKERS]);
 function render() {
   const s = parse(cur), e = addDays(s, 6);
   $("range").textContent = `${s.getMonth()+1}월 ${s.getDate()}일 ~ ${e.getMonth()+1}월 ${e.getDate()}일`;
@@ -103,7 +103,7 @@ function render() {
     c.classList.toggle("wait", !!ok && !v.ok);
     if (ok) {
       const h = [...c.dataset.c].reduce((n, ch) => n * 31 + ch.charCodeAt(0), 7);
-      c.innerHTML = `<span class="stk${isDrawn(v.s) ? " drawn" : ""}" style="--tilt:${(h % 15) - 7}deg;--d:${(h % 9) * 0.5}s">${stickerHTML(v.s)}</span>`;
+      c.innerHTML = `<span class="stk${isPic(v.s) ? " drawn" : ""}" style="--tilt:${(h % 15) - 7}deg;--d:${(h % 9) * 0.5}s">${stickerHTML(v.s)}</span>`;
     } else c.innerHTML = "";
   });
   const n = count(cur), r = rewardFor(n);
@@ -139,10 +139,10 @@ function openSheet(html, bind, closable = true) {
 function closeSheet() { $("sheetHost").innerHTML = ""; }
 let lastPack = null;
 const packCards = () => `<div class="packs">${PACKS.map((p, i) => `<button class="pack" data-pack="${i}" style="--pc:${p.color}">
-    <span class="pv">${p.items.slice(0, 4).map(s => `<span class="mini${isDrawn(s) ? "" : " glit"}">${stickerHTML(s)}</span>`).join("")}</span>
+    <span class="pv">${p.items.slice(0, 4).map(s => `<span class="mini${isPic(s) ? "" : " glit"}">${stickerHTML(s)}</span>`).join("")}</span>
     <b>${p.name}</b><small>${p.items.length}개</small></button>`).join("")}</div>`;
 const stickerButtons = i => `<div class="pack-head"><button class="back" id="packBack">‹ 스티커 팩</button><b>${PACKS[i].name}</b></div>
-  <div class="stickers${PACKS[i].glitter ? " glit" : " drawn"}">${PACKS[i].items.map(s => `<button data-s="${s}" aria-label="${stickerLabel(s)} 스티커">${stickerHTML(s)}</button>`).join("")}</div>`;
+  <div class="stickers${PACKS[i].glitter ? " glit" : " drawn"}">${PACKS[i].items.map(s => `<button data-s="${s}" aria-label="${stickerLabel(s) || "그림"} 스티커">${stickerHTML(s)}</button>`).join("")}</div>`;
 const grid = () => `<div id="stkArea">${lastPack === null ? packCards() : stickerButtons(lastPack)}</div>`;
 function wireTabs(h, onPick) {
   const area = $("stkArea");
@@ -171,7 +171,7 @@ function onCell(ck) {
   const v = ((weeks[cur] || {}).cells || {})[ck];
   const [r, d] = ck.split("-").map(Number);
   const head = `<h3>${DAYS[d]}요일 · ${MISSIONS[r]}</h3>`;
-  const big = v ? `<div class="big1${isDrawn(v.s) ? " drawn" : ""}">${stickerHTML(v.s)}</div>` : "";
+  const big = v ? `<div class="big1${isPic(v.s) ? " drawn" : ""}">${stickerHTML(v.s)}</div>` : "";
   // 붙어 있는 스티커: 떼기 / 그냥 두기 만
   const removeSheet = (extra = "") => openSheet(head + big + `<div class="acts2">${extra}<button class="no" id="rm">떼기</button><button id="keep">그냥 두기</button></div>`, () => {
     $("rm").onclick = () => { writeCell(cur, ck, null); closeSheet(); };

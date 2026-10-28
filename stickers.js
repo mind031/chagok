@@ -76,3 +76,170 @@ export function stickerSVG(id) {
     `<g stroke="${O}" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round">${body}</g></svg>`;
 }
 export const isDrawn = s => typeof s === "string" && s.startsWith("d:") && !!DRAW[s.slice(2)];
+
+// 엄마·아빠가 준 스티커 판에서 오려 낸 스티커 (st/ 폴더)
+export const SHEET_PACKS = [
+ {
+  "id": "morning",
+  "name": "아침 미션",
+  "color": "#fff1c4",
+  "items": [
+   "p:morning-1",
+   "p:morning-2",
+   "p:morning-3",
+   "p:morning-4",
+   "p:morning-6",
+   "p:morning-7",
+   "p:morning-8",
+   "p:morning-9",
+   "p:morning-10",
+   "p:morning-11",
+   "p:morning-12",
+   "p:morning-13"
+  ]
+ },
+ {
+  "id": "house",
+  "name": "집안일하기",
+  "color": "#dcf3d6",
+  "items": [
+   "p:house-1",
+   "p:house-2",
+   "p:house-3",
+   "p:house-4",
+   "p:house-5",
+   "p:house-6",
+   "p:house-7",
+   "p:house-8",
+   "p:house-9",
+   "p:house-10",
+   "p:house-11"
+  ]
+ },
+ {
+  "id": "night",
+  "name": "저녁 / 자기 전",
+  "color": "#dbeeff",
+  "items": [
+   "p:night-1",
+   "p:night-2",
+   "p:night-3",
+   "p:night-4",
+   "p:night-5",
+   "p:night-6",
+   "p:night-7",
+   "p:night-8",
+   "p:night-9",
+   "p:night-10",
+   "p:night-11",
+   "p:night-12"
+  ]
+ },
+ {
+  "id": "study",
+  "name": "공부하기",
+  "color": "#ebe3ff",
+  "items": [
+   "p:study-1",
+   "p:study-2",
+   "p:study-3",
+   "p:study-4",
+   "p:study-5",
+   "p:study-6",
+   "p:study-7",
+   "p:study-8",
+   "p:study-9",
+   "p:study-10",
+   "p:study-11",
+   "p:study-12"
+  ]
+ },
+ {
+  "id": "animal",
+  "name": "동물 친구들",
+  "color": "#ffe3ea",
+  "items": [
+   "p:animal-1",
+   "p:animal-2",
+   "p:animal-3",
+   "p:animal-4",
+   "p:animal-5",
+   "p:animal-6",
+   "p:animal-7",
+   "p:animal-8",
+   "p:animal-9",
+   "p:animal-10",
+   "p:animal-11",
+   "p:animal-12"
+  ]
+ },
+ {
+  "id": "food",
+  "name": "음식 & 간식",
+  "color": "#ffe7d3",
+  "items": [
+   "p:food-1",
+   "p:food-2",
+   "p:food-3",
+   "p:food-4",
+   "p:food-5",
+   "p:food-6",
+   "p:food-7",
+   "p:food-8",
+   "p:food-9",
+   "p:food-10",
+   "p:food-11",
+   "p:food-12",
+   "p:food-13",
+   "p:food-14",
+   "p:food-15",
+   "p:food-16"
+  ]
+ },
+ {
+  "id": "nature",
+  "name": "식물 & 자연",
+  "color": "#e3f5d6",
+  "items": [
+   "p:nature-1",
+   "p:nature-2",
+   "p:nature-3",
+   "p:nature-4",
+   "p:nature-5",
+   "p:nature-6",
+   "p:nature-7",
+   "p:nature-8",
+   "p:nature-9",
+   "p:nature-10",
+   "p:nature-11",
+   "p:nature-12",
+   "p:nature-13",
+   "p:nature-14"
+  ]
+ },
+ {
+  "id": "feeling",
+  "name": "감정 스티커",
+  "color": "#ffe3ec",
+  "items": [
+   "p:feeling-1",
+   "p:feeling-2",
+   "p:feeling-3",
+   "p:feeling-4",
+   "p:feeling-5",
+   "p:feeling-6",
+   "p:feeling-7",
+   "p:feeling-8",
+   "p:feeling-9",
+   "p:feeling-10",
+   "p:feeling-11",
+   "p:feeling-12",
+   "p:feeling-13",
+   "p:feeling-14",
+   "p:feeling-15",
+   "p:feeling-16"
+  ]
+ }
+];
+export const isSheet = s => typeof s === "string" && /^p:[a-z]+-\d+$/.test(s);
+export const sheetImg = s => `<img src="st/${s.slice(2)}.webp" alt="" draggable="false">`;

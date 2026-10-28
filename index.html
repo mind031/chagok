@@ -98,10 +98,11 @@ button:focus-visible,label:focus-within{outline:3px solid var(--blue);outline-of
 .sheet h3{margin:0;font-weight:400;font-size:22px;text-wrap:balance}
 .sheet p{margin:0;color:var(--soft);font-size:16px}
 .packs{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media (min-width:700px){.sheet:has(.packs),.sheet:has(.stickers){width:min(660px,100%)}.packs{grid-template-columns:repeat(4,1fr)}.stickers{grid-template-columns:repeat(6,1fr)}}
 .pack{border:none;border-radius:20px;background:var(--pc);padding:12px 10px 10px;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 2px 0 rgba(74,58,51,.12)}
 .pack .pv{display:grid;grid-template-columns:repeat(2,1fr);gap:2px;width:92px}
 .pack .mini{width:44px;height:44px;display:grid;place-items:center}
-.pack .mini svg{width:44px;height:44px}
+.pack .mini svg,.pack .mini img{width:44px;height:44px;object-fit:contain}
 .pack .mini.glit i{font-style:normal;font-size:26px}
 .pack b{font-weight:400;font-size:18px}
 .pack small{font-size:13px;color:var(--soft)}
@@ -110,16 +111,16 @@ button:focus-visible,label:focus-within{outline:3px solid var(--blue);outline-of
 .back{border:none;background:#f6f1ea;border-radius:999px;padding:7px 12px;font-size:15px}
 .stickers{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px}
 .stickers button{position:relative;border:none;background:#fbf7f1;border-radius:18px;aspect-ratio:1;max-width:100%;padding:4px;display:grid;place-items:center}
-.stickers button svg{width:100%;height:100%;filter:drop-shadow(0 2px 2px rgba(74,58,51,.25))}
+.stickers button svg,.stickers button img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 2px 2px rgba(74,58,51,.25));-webkit-user-drag:none}
 .stickers.glit button{border:3px solid #fff;border-radius:50%;font-size:28px;overflow:hidden;padding:0;
   background:conic-gradient(from 210deg,#ffd6e8,#ffe9b8,#d9ffd1,#c9f1ff,#e2d6ff,#ffd6f5,#ffd6e8);box-shadow:0 2px 5px rgba(90,60,40,.25)}
 .stickers.glit button i{font-style:normal}
 .stickers button:active{transform:scale(.92)}
-.big1.drawn svg{width:120px;height:120px}
+.big1.drawn svg,.big1.drawn img{width:120px;height:120px;object-fit:contain}
 .big1 i{font-style:normal}
 .cell .stk.drawn{background:none;border:none;box-shadow:none;overflow:visible;width:5.6cqw;height:5.6cqw}
 .cell .stk.drawn::before,.cell .stk.drawn::after{display:none}
-.cell .stk.drawn svg{width:100%;height:100%;filter:drop-shadow(0 .2cqw .25cqw rgba(74,58,51,.3))}
+.cell .stk.drawn svg,.cell .stk.drawn img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 .2cqw .25cqw rgba(74,58,51,.3));-webkit-user-drag:none}
 .cell.wait .stk.drawn{border:none;filter:grayscale(.5) opacity(.5)}
 .acts2{display:flex;gap:8px}
 .acts2 button{flex:1;border:none;border-radius:999px;padding:12px;font-size:17px;background:var(--line)}
@@ -152,6 +153,6 @@ button:focus-visible,label:focus-within{outline:3px solid var(--blue);outline-of
 <div id="sheetHost"></div>
 
 <script src="firebase-config.js"></script>
-<script type="module" src="app.js?v=5"></script>
+<script type="module" src="app.js?v=6"></script>
 </body>
 </html>
