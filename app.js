@@ -171,28 +171,26 @@ function onCell(ck) {
   const v = ((weeks[cur] || {}).cells || {})[ck];
   const [r, d] = ck.split("-").map(Number);
   const head = `<h3>${DAYS[d]}요일 · ${MISSIONS[r]}</h3>`;
-  const tail = `<div class="acts2">${v ? '<button class="no" id="rm">떼기</button>' : ""}<button id="cl">닫기</button></div>`;
-  const wire = (ok, after) => h => {
+  const big = v ? `<div class="big1${isDrawn(v.s) ? " drawn" : ""}">${stickerHTML(v.s)}</div>` : "";
+  // 붙어 있는 스티커: 떼기 / 그냥 두기 만
+  const removeSheet = (extra = "") => openSheet(head + big + `<div class="acts2">${extra}<button class="no" id="rm">떼기</button><button id="keep">그냥 두기</button></div>`, () => {
+    $("rm").onclick = () => { writeCell(cur, ck, null); closeSheet(); };
+    $("keep").onclick = closeSheet;
+    const ap = $("ap"); if (ap) ap.onclick = () => { approve([ck]); closeSheet(); };
+  });
+  const pickSheet = (ok, msg, after) => openSheet(head + `<p>${msg}</p>` + grid() + `<div class="acts2"><button id="cl">닫기</button></div>`, h => {
     const pick = b => { const before = count(cur); writeCell(cur, ck, { s: b.dataset.s, ok }); closeSheet(); sparkle(ck); after(before); };
-    h.querySelectorAll("[data-s]").forEach(b => b.onclick = () => pick(b));
     wireTabs(h, pick);
     $("cl").onclick = closeSheet;
-    if (v) $("rm").onclick = () => { writeCell(cur, ck, null); closeSheet(); };
-  };
+  });
   if (!parent) {
     if (v && v.ok) { say("벌써 붙였어요!<br>최고야"); return; }
-    openSheet(head + `<p>${v ? "다른 스티커로 바꾸거나 뗄 수 있어요." : "마음에 드는 스티커를 골라요. 엄마·아빠가 확인하면 진짜로 붙어요."}</p>` + grid() + tail,
-      wire(false, () => say("엄마·아빠한테<br>보여주자!")));
-    return;
+    if (v) return removeSheet();
+    return pickSheet(false, "마음에 드는 스티커를 골라요. 엄마·아빠가 확인하면 진짜로 붙어요.", () => say("엄마·아빠한테<br>보여주자!"));
   }
-  if (v && !v.ok) {
-    openSheet(head + `<p>아이가 붙인 스티커예요.</p><div class="big1${isDrawn(v.s) ? " drawn" : ""}">${stickerHTML(v.s)}</div><div class="acts2"><button class="ok" id="ap">승인하기</button><button class="no" id="rm">떼기</button></div>`, () => {
-      $("ap").onclick = () => { approve([ck]); closeSheet(); };
-      $("rm").onclick = () => { writeCell(cur, ck, null); closeSheet(); };
-    });
-    return;
-  }
-  openSheet(head + `<p>${v ? "스티커를 바꾸거나 뗄 수 있어요." : "바로 붙일 스티커를 골라요."}</p>` + grid() + tail, wire(true, cheer));
+  if (v && !v.ok) return removeSheet('<button class="ok" id="ap">승인하기</button>');
+  if (v) return removeSheet();
+  pickSheet(true, "바로 붙일 스티커를 골라요.", cheer);
 }
 function cheer(before) {
   const after = count(cur), t = TIERS.filter(([x]) => before < x && after >= x).pop();
