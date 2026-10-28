@@ -124,7 +124,6 @@ export const SHEET_PACKS = [
    "p:night-1",
    "p:night-2",
    "p:night-3",
-   "p:night-4",
    "p:night-5",
    "p:night-6",
    "p:night-7",
