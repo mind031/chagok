@@ -1,5 +1,5 @@
 // 차곡차곡 오프라인 캐시 — 파일을 고치면 아래 버전 숫자를 올려 주세요
-const CACHE = "chagok-v8";
+const CACHE = "chagok-v9";
 const FILES = [
   "./", "index.html", "app.js", "stickers.js", "firebase-config.js", "board.webp",
   "manifest.webmanifest", "icon-192.png", "icon-512.png", "apple-touch-icon.png"

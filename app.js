@@ -71,6 +71,7 @@ function buildOverlay() {
   h += `<button class="o pbtn" id="parentBtn" style="${box(640,40,824,118)}"><span class="k" id="pKey">🔒</span><span id="pTxt">엄마·아빠 확인</span><small id="pSub">비밀번호로 들어가요</small></button>`;
   h += `<div class="o patch" style="${box(864,76,1156,124)}"></div>`;
   h += `<div class="o wk" style="${box(866,76,1154,124)}"><button class="nav" id="prevW" aria-label="지난주">‹</button><label><span id="range"></span><span class="c">📅</span><input type="date" id="weekPick" aria-label="날짜 고르기"></label><button class="nav" id="nextW" aria-label="다음 주">›</button></div>`;
+  h += `<button class="o today-btn" id="todayW" style="${box(1040,44,1150,72)}" hidden>↩ 오늘로</button>`;
   h += `<div class="o patch say" id="say" style="${box(1304,30,1434,102)}">${HELLO}</div>`;
   h += `<div class="o today" id="today" hidden></div>`;
   ROWS.forEach(([y1, y2], r) => COLS.forEach(([x1, x2], d) => {
@@ -92,6 +93,7 @@ function render() {
   $("weekPick").value = cur;
   const now = new Date(), isThis = keyOf(monday(now)) === cur, t = $("today");
   t.hidden = !isThis;
+  $("todayW").hidden = isThis;
   if (isThis) { const [x1, x2] = COLS[(now.getDay() + 6) % 7]; t.setAttribute("style", box(x1 - 1, 150, x2 + 1, 897)); }
   const cells = (weeks[cur] || {}).cells || {};
   document.querySelectorAll(".cell").forEach(c => {
@@ -304,6 +306,7 @@ async function startOnline(cfg) {
 buildOverlay();
 $("ov").addEventListener("click", e => { const c = e.target.closest(".cell"); if (!c) return; if (parent) resetT(); onCell(c.dataset.c); });
 $("prevW").onclick = () => { cur = keyOf(addDays(parse(cur), -7)); render(); };
+$("todayW").onclick = () => { cur = keyOf(monday(new Date())); render(); say("이번 주로<br>돌아왔어요!"); };
 $("nextW").onclick = () => { cur = keyOf(addDays(parse(cur), 7)); render(); };
 $("weekPick").addEventListener("change", e => { if (e.target.value) { cur = keyOf(monday(parse(e.target.value))); render(); } });
 $("parentBtn").onclick = () => parent ? exitParent() : pinSheet();
