@@ -1,5 +1,5 @@
 // 차곡차곡 오프라인 캐시 — 파일을 고치면 아래 버전 숫자를 올려 주세요
-const CACHE = "chagok-v11";
+const CACHE = "chagok-v12";
 const FILES = [
   "./", "index.html", "app.js", "stickers.js", "firebase-config.js", "board.webp",
   "manifest.webmanifest", "icon-192.png", "icon-512.png", "apple-touch-icon.png"
@@ -21,7 +21,7 @@ self.addEventListener("fetch", e => {
   if (e.request.method !== "GET" || url.origin !== self.location.origin) return;
   // 새 버전을 먼저 받아오고, 인터넷이 없으면 저장해 둔 파일을 쓴다
   e.respondWith(
-    fetch(e.request)
+    fetch(e.request, { cache: "no-cache" })
       .then(res => {
         if (res.ok) { const copy = res.clone(); caches.open(CACHE).then(c => c.put(e.request, copy)); }
         return res;
