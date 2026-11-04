@@ -330,6 +330,19 @@ if (cfg && cfg.apiKey && !String(cfg.apiKey).startsWith("여기에")) {
   note("지금은 이 기기에만 저장돼요. 설정 안내서대로 파이어베이스를 연결하면 두 기기에서 같이 쓸 수 있어요.");
 }
 
+// 새 버전이 올라왔으면 알아서 새로고침 (앱을 다시 열 때마다 확인)
+const MY_V = (([...document.scripts].map(s => s.src).find(s => s.includes("app.js")) || "").match(/v=(\d+)/) || [])[1];
+async function checkUpdate() {
+  try {
+    const html = await (await fetch("index.html", { cache: "no-store" })).text();
+    const live = (html.match(/app\.js\?v=(\d+)/) || [])[1];
+    if (live && MY_V && live !== MY_V && !document.querySelector("#sheetHost .sheet")) location.reload();
+  } catch (e) {}
+}
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkUpdate(); });
+window.addEventListener("pageshow", checkUpdate);
+setTimeout(checkUpdate, 3000);
+
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
 }
